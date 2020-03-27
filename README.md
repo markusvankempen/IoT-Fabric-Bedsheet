@@ -1,2 +1,2 @@
 # IoT-Fabric-Bedsheet
-There are come code examples for the IoT Bedsheet form Studio1LAbs
+There are some code examples for the IoT Bedsheet from Studio1Labs (https://www.studio1labs.com/)
