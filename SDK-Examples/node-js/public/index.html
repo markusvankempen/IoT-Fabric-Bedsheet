@@ -1,0 +1,154 @@
+
+<!--
+
+Display serial data in a heatmap
+
+VERSION: 25MAr2020
+
+ -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+<h3>Infos</h3>
+<div id="SENSORINFO"></div>
+
+<script>
+  let socket = io();
+  socket.on('connect', function () {
+    socket.on('sensor-data', function (json) {
+      //console.log(json);
+      myplot(json)
+
+    });
+    socket.on('fabric-info', function (json) {
+      console.log(json);
+      if(json.indexOf("VERSION") ==0)
+        document.getElementById("SENSORINFO").innerHTML = json +"<BR>";
+      else
+        document.getElementById("SENSORINFO").innerHTML += json +"<BR>";
+
+    });
+  });
+
+
+//myplot(msg.payload)
+
+
+// set the dimensions and margins of the graph
+var margin = {top: 50, right: 50, bottom: 50, left: 50},
+  width = 850 - margin.left - margin.right,
+  height = 550 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+.append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+.append("g")
+  .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+// Labels of row and columns
+var myGroups = ["C1", "C2","C3", "C4","C5", "C6","C7", "C8"]
+var myVars   = ["R1", "R2","R3", "R4","R5", "R6","R7", "R8"]
+
+// Build X scales and axis:
+var x = d3.scaleBand()
+  .range([ 0, width ])
+  .domain(myGroups)
+  .padding(0.01);
+svg.append("g")
+  .attr("transform", "translate(0," + height + ")")
+  .call(d3.axisBottom(x))
+
+// Build X scales and axis:
+var y = d3.scaleBand()
+  .range([ height, 0 ])
+  .domain(myVars)
+  .padding(0.01);
+svg.append("g")
+  .call(d3.axisLeft(y));
+
+// Build color scale
+var myColor = d3.scaleLinear()
+  .range(["white", "#69b3FF"])
+  .domain([1,200])
+
+mvkdata=[{"group":"C1","variable":"R1","value":82},{"group":"C1","variable":"R2","value":182},{"group":"C1","variable":"R3","value":290},{"group":"C1","variable":"R4","value":67},{"group":"C1","variable":"R5","value":263},{"group":"C1","variable":"R6","value":341},{"group":"C1","variable":"R7","value":340},{"group":"C1","variable":"R8","value":62},{"group":"C2","variable":"R1","value":206},{"group":"C2","variable":"R2","value":76},{"group":"C2","variable":"R3","value":4},{"group":"C2","variable":"R4","value":290},{"group":"C2","variable":"R5","value":171},{"group":"C2","variable":"R6","value":215},{"group":"C2","variable":"R7","value":79},{"group":"C2","variable":"R8","value":15},{"group":"C3","variable":"R1","value":7},{"group":"C3","variable":"R2","value":252},{"group":"C3","variable":"R3","value":281},{"group":"C3","variable":"R4","value":271},{"group":"C3","variable":"R5","value":326},{"group":"C3","variable":"R6","value":21},{"group":"C3","variable":"R7","value":52},{"group":"C3","variable":"R8","value":109},{"group":"C4","variable":"R1","value":142},{"group":"C4","variable":"R2","value":349},{"group":"C4","variable":"R3","value":132},{"group":"C4","variable":"R4","value":93},{"group":"C4","variable":"R5","value":173},{"group":"C4","variable":"R6","value":142},{"group":"C4","variable":"R7","value":257},{"group":"C4","variable":"R8","value":134},{"group":"C5","variable":"R1","value":126},{"group":"C5","variable":"R2","value":155},{"group":"C5","variable":"R3","value":180},{"group":"C5","variable":"R4","value":304},{"group":"C5","variable":"R5","value":314},{"group":"C5","variable":"R6","value":332},{"group":"C5","variable":"R7","value":84},{"group":"C5","variable":"R8","value":309},{"group":"C6","variable":"R1","value":174},{"group":"C6","variable":"R2","value":10},{"group":"C6","variable":"R3","value":168},{"group":"C6","variable":"R4","value":342},{"group":"C6","variable":"R5","value":306},{"group":"C6","variable":"R6","value":282},{"group":"C6","variable":"R7","value":99},{"group":"C6","variable":"R8","value":96},{"group":"C7","variable":"R1","value":326},{"group":"C7","variable":"R2","value":334},{"group":"C7","variable":"R3","value":6},{"group":"C7","variable":"R4","value":305},{"group":"C7","variable":"R5","value":125},{"group":"C7","variable":"R6","value":251},{"group":"C7","variable":"R7","value":35},{"group":"C7","variable":"R8","value":321},{"group":"C8","variable":"R1","value":166},{"group":"C8","variable":"R2","value":212},{"group":"C8","variable":"R3","value":349},{"group":"C8","variable":"R4","value":224},{"group":"C8","variable":"R5","value":96},{"group":"C8","variable":"R6","value":259},{"group":"C8","variable":"R7","value":120},{"group":"C8","variable":"R8","value":-1}]
+//console.log(mvkdata)
+//Read the data
+
+function myplot(data)
+{
+//d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/heatmap_data.csv", function(data) {
+//console.log(data)
+  // create a tooltip
+  /*
+  var tooltip = d3.select("#my_dataviz")
+    .append("div")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
+*/
+  // Three function that change the tooltip when user hover / move / leave a cell
+  var mouseover = function(d) {
+    tooltip.style("opacity", 1)
+  }
+  var mousemove = function(d) {
+    tooltip
+      .html("The exact value of<br>this cell is: " + d.value)
+      .style("left", "10px")
+      .style("top", "10px")
+      //.style("left", (d3.mouse(this)[0]+70) + "px")
+     // .style("top", (d3.mouse(this)[1]) + "px")
+  }
+  var mouseleave = function(d) {
+    tooltip.style("opacity", 0)
+  }
+
+  // add the squares
+  svg.selectAll()
+    .data(data, function(d) {return d.group+':'+d.variable;})
+    .enter()
+    .append("rect")
+      .attr("x", function(d) { return x(d.group) })
+      .attr("y", function(d) { return y(d.variable) })
+      .attr("width", x.bandwidth() )
+      .attr("height", y.bandwidth() )
+      .style("fill", function(d) { return myColor(d.value)} )
+      .append("text")
+      .text(function(d){
+        return d.value;
+      })
+      .attr("y", 20)
+      .style("font-family", "arial")
+      .style("font-size", "8pt")
+
+    .on("mouseover", mouseover)
+    .on("mousemove", mousemove)
+    .on("mouseleave", mouseleave)
+//})
+  svg.selectAll()
+    .data(data, function(d) {return d.group+':'+d.variable;})
+    .enter()
+
+     .append("text")
+           .attr("x", function(d) { return x(d.group)+20 })
+      .attr("y", function(d) { return y(d.variable)+30 })
+      .style("fill", "black")
+      .style("font-size", "14px")
+      .text( function(d) { return d.value} )
+
+}
+myplot(mvkdata)
+</script>
