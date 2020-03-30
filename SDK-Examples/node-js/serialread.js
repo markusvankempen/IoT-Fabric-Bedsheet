@@ -1,44 +1,16 @@
 /*
- * Example javascript for parsing the Fabric Sensor Data and display on a head map
+ * Example javascript for parsing the Fabric Sensor Data
  * VERSION: 25-Mar-2020
 */
 
 var SerialPort = require('serialport');
 const Delimiter = require('@serialport/parser-delimiter')
-// dev/tty.ST1-MVK-05-DevB // Bluetooth
-//var port = new SerialPort("/dev/tty.usbserial-143320",
-var port = new SerialPort("/dev/tty.ST1-MAR-20-DevB",
-
-{
+//var port = new SerialPort("/dev/tty.usbserial-143320", {
+  var port = new SerialPort("/dev/tty.ST1-MAR-20-DevB", {
     baudRate: 115200
 });// Read the port data
 
 
-// Server
-const express = require('express')
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-
-// Needed to fix the index.html not finding the CSS file.
-// Files must be in the folder 'public'
-app.use(express.static('public'));
-
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/public/');
-});
-
-io.on('connection', function(socket){
-  console.log('>>>SERVER>>> a user connected');
-
-  socket.on('disconnect', function(){
-    console.log('>>>SERVER>>> user disconnected');
-  });
-});
-
-http.listen(8000, function(){
-  console.log('>>>SERVER>>> listening on *:8000');
-});
 
 
 port.on("open", function () {
@@ -70,22 +42,19 @@ parser.on('data', function(data) {
 
     SENSOR_COLS=parseInt(mydata.substr(9,10));
 
-    console.log(">>>Grab Sensor = "+ SENSOR_ROWS+ "x" +SENSOR_COLS);
-    // if pretty like  000,000 than
-    //ARRAYSIZE=(SENSOR_COLS*4)*SENSOR_ROWS
+    console.log(">>>Grap Sensor = "+ SENSOR_ROWS+ "x" +SENSOR_COLS);
     ARRAYSIZE=(SENSOR_COLS*4)*SENSOR_ROWS
     console.log(">>>ArraySize ="+ARRAYSIZE);
     if(isNaN(ARRAYSIZE))
-    ARRAYSIZE=100;
+    ARRAYSIZE=150;
   }
 
-  if(mydata.length > (ARRAYSIZE-10)) // sensor data string
+  if(mydata.length > (ARRAYSIZE-2)) // sensor data string
   {
   //  console.log(mydata.length);
     //console.log(mydata) // emits data after every '\n'
       // Create Martix
-    //  delaytime =  parseInt(mydata.substr(mydata.indexOf(",#")+2,mydata.length-3)); //fish out the delay
-    mydata=mydata.substr(0,mydata.indexOf(",#")); // remove ,#delaytime#
+    mydata=mydata.substr(0,ARRAYSIZE); // remove ,#
     myvalues=mydata.split(",")
 
     // msg.values[msg.values.length-1] =
@@ -110,7 +79,7 @@ parser.on('data', function(data) {
         }
     }
     matrix.reverse()  // 1st row of data is the botton left
-  //  console.log(matrix);
+    console.log(matrix);
 
     v=1
     g=1
@@ -124,23 +93,17 @@ parser.on('data', function(data) {
       myd.value =myvalues[a]
       bigdata.push(myd)
       v++
-
-      if(SENSOR_COLS < v)
+      if(v>8)
       {
             v=1
             g++
           }
 
    }
-    // console.log(bigdata)
-
-    // SEND DATA via socket to html page
-io.emit('sensor-data', bigdata);
-
-}else{
-   console.log(mydata);
-   io.emit('fabric-info', mydata);
- }
+   //console.log(bigdata);
+ }else(
+   console.log(mydata)
+ )
 
 /*
   if (data.toString('utf8').indexOf("NOISE"))
