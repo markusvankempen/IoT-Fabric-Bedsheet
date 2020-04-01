@@ -104,9 +104,9 @@ try:
             data = {"id": id,"data": line}
 
             if len(line) > 50:
-                success = deviceCli.publishEvent("fabicsensor", "json", data, qos=0)
+                success = deviceCli.publishEvent("fabricsensor", "json", data, qos=0)
             else:
-                success = deviceCli.publishEvent("fabicinfo", "json", data, qos=0)
+                success = deviceCli.publishEvent("fabricinfo", "json", data, qos=0)
                 pass
 
 

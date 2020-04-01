@@ -83,7 +83,7 @@ try:
         if len(line) > 50:
             mqttc.publish("fabric/sensor", line)
         else:
-            mqttc.publish("fabric/data", line)
+            mqttc.publish("fabric/info", line)
         pass
 
 
