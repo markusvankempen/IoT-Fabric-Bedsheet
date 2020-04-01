@@ -1,13 +1,13 @@
 #
 # send data to a cloud UI for testing / calibration debugging
-#
+# Remote dashboarding
 # https://maristnr.mybluemix.net/ui
 #
-# Feature it also allow to remote control the sheet
+# Feature: the programm send data to the IBM cloud and also allows to remote control the sheet
 #
 
 MYID = "MARKUSTEST"  # define ID "MarkusToronto" so u can select ur data
-
+id ='' #temp
 import serial
 import os
 import time
@@ -23,11 +23,16 @@ serialdev = '/dev/tty.usbserial-143320'
 def commandProcessor(incoming):
     print("Command received: %s" % incoming.data)
     #mydata = json.loads(str(incoming.data))
-    print(incoming.data["cmd"])
+    cmdid=incoming.data["id"]
+    print(cmdid)
+    if(cmdid == id ):
+        print("Sending ->"+incoming.data["cmd"])
 #s   er.write("format=1\n".encode())
-    ser.write(incoming.data["cmd"].encode())
+        ser.write(incoming.data["cmd"].encode())
     #ser.write(mydata.cmd+"="+mydata.cmd.value+"\n".encode())
     #ser.flush()
+    else:
+        print( "WARNING >>>> Wrong ID - cmdid ="+cmdid+" deviceid ="+ id )
 
 
 #MQTT callbacks
@@ -66,7 +71,7 @@ except:
 def on_connect(client, userdata, flages, rc):
         print("Connected with result code=",rc)
 
-id =''
+
 try:
     ser.flushInput()
 
@@ -77,7 +82,7 @@ try:
     while True:# mqttc.loop() == 0:
         line = ser.readline()
         line = line.decode("utf-8")
-        print(line)
+        #print(line)
 
 
         # SET ID
