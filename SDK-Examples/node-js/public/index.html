@@ -27,7 +27,7 @@ VERSION: 25MAr2020
 
     });
     socket.on('fabric-info', function (json) {
-      console.log(json);
+     // console.log(json);
       if(json.indexOf("VERSION") ==0)
         document.getElementById("SENSORINFO").innerHTML = json +"<BR>";
       else
